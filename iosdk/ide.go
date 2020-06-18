@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"os/user"
 	"path/filepath"
-	"runtime"
 )
 
 // IdeDeploy deploys and mounts a folder
@@ -47,18 +45,19 @@ func ideDockerRun(dir string) (err error) {
 		return fmt.Errorf("cannot find openwhisk")
 	}
 
-	uid := ""
-	if runtime.GOOS == "linux" {
-		usr, err := user.Current()
-		LogIf(err)
-		if err == nil {
-			uid = fmt.Sprintf("-u %s", usr.Uid)
-		}
-	}
+	// uid := ""
+	// if runtime.GOOS == "linux" {
+	// 	usr, err := user.Current()
+	// 	LogIf(err)
+	// 	if err == nil {
+	// 		uid = fmt.Sprintf("-u %s", usr.Uid)
+	// 	}
+	// }
 
-	command := fmt.Sprintf(`docker run -d -p 3000:3000
-	--rm --name iosdk-theia -e HOME=/home/project -e USER=iosdk %s
-	--add-host=openwhisk:%s %s %s`, uid, *openwhiskIP, mount, image)
+	command := fmt.Sprintf(`docker run -d -p 3000:3000 --add-host localhost:172.17.0.1
+	-v //var/run/docker.sock:/var/run/docker.sock
+	--rm --name iosdk-theia
+	--add-host=openwhisk:%s %s %s`, *openwhiskIP, mount, image)
 	Sys(command)
 	return nil
 }
