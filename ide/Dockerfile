@@ -19,9 +19,9 @@ ADD ide-plugin /home/theia/plugins/ide-plugin
 RUN sudo find /home/theia -uid 0 -exec chown theia:theia {} \;
 #RUN cd /home/theia/plugins/ide-plugin && npm install && npm run build
 
-#RUN sudo mkdir /home/wskdebug && cd /home/wskdebug && sudo npm install @openwhisk/wskdebug
 RUN sudo git clone https://github.com/apache/openwhisk-wskdebug.git /home/wskdebug
-RUN cd /home/wskdebug && sudo sed -i 's/localhost/172.17.0.1/g' src/agents/ngrok.js && sudo npm install -g @openwhisk/wskdebug --unsafe-perm=true --allow-root
+#RUN cd /home/wskdebug && sudo npm install -g @openwhisk/wskdebug --unsafe-perm=true --allow-root
+RUN cd /home/wskdebug && sudo sed -i 's|0.0.0.0:${hostRuntimePort}|172.17.0.1:${hostRuntimePort}|g' src/invoker.js && sudo npm install -g @openwhisk/wskdebug --unsafe-perm=true --allow-root
 
 RUN sudo groupadd --gid 999 docker
 RUN sudo usermod -a -G docker theia
