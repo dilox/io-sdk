@@ -14,6 +14,9 @@ RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
     && tar -xzf docker-18.06.3-ce.tgz -C /usr/local \
     && ln -s /usr/local/docker/docker /usr/local/bin
 
+RUN groupadd --gid 999 docker
+RUN usermod -a -G docker theia
+
 USER theia
 ADD ide-plugin /home/theia/plugins/ide-plugin
 RUN sudo find /home/theia -uid 0 -exec chown theia:theia {} \;
@@ -21,10 +24,7 @@ RUN sudo find /home/theia -uid 0 -exec chown theia:theia {} \;
 
 RUN sudo git clone https://github.com/apache/openwhisk-wskdebug.git /home/wskdebug
 #RUN cd /home/wskdebug && sudo npm install -g @openwhisk/wskdebug --unsafe-perm=true --allow-root
-RUN cd /home/wskdebug && sudo sed -i 's|0.0.0.0:${hostRuntimePort}|172.17.0.1:${hostRuntimePort}|g' src/invoker.js && sudo npm install -g @openwhisk/wskdebug --unsafe-perm=true --allow-root
+RUN cd /home/wskdebug && sudo sed -i 's|0.0.0.0:${hostRuntimePort}|172.17.0.1:${hostRuntimePort}|g' src/invoker.js && sudo npm install && sudo ln -s /home/wskdebug/wskdebug.js /usr/local/bin/wskdebug
 
-RUN sudo groupadd --gid 999 docker
-RUN sudo usermod -a -G docker theia
-#RUN sudo ln -s /home/wskdebug/node_modules/.bin/wskdebug /usr/local/bin/wskdebug
 RUN sudo find /home/theia -uid 0 -exec chown theia:theia {} \;
 
